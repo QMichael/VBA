@@ -1,0 +1,24 @@
+Option Explicit
+Public i%
+Private Sub CommandButton1_Click()
+    Dim w1 As Worksheet, w2 As Worksheet, j%
+    CommandButton1.Top = Range("A" & ActiveWindow.ScrollRow).Top + 300
+    Set w1 = Worksheets("2020年民政局来文")
+    Set w2 = Worksheets("传阅单")
+    w2.Range("B4") = w1.Cells(i, 2)
+    w2.Range("B6") = w1.Cells(i, 3)
+    w2.Range("C5") = w1.Cells(i, 4)
+    w2.Range("D5") = w1.Cells(i, 5)
+    j = MsgBox("是否打印第" & i - 1 & "号传阅单", vbYesNo, "注意")
+    If j = 6 Then
+        w2.PrintOut
+    End If
+End Sub
+
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+    i = ActiveCell.Row
+End Sub
+
+Sub mycolor()
+    CommandButton1.BackColor = RGB(204, 232, 207)
+End Sub
