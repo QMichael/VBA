@@ -1,0 +1,62 @@
+Option Explicit
+Private Sub CommandButton1_Click()
+    Dim d As Object, w1 As Worksheet, w2 As Worksheet, a(), i%, k, r As Range
+    Set d = CreateObject("scripting.dictionary")
+    Set w1 = Worksheets("基本信息")
+    Set w2 = Worksheets("计算统计")    
+    '清除内容
+    w2.Range("A2:F1000").ClearContents
+    i = 2
+    '判断统计信息中是否还有要统计的数据
+    Do While w1.Cells(i, 2) <> ""
+        k = w1.Cells(i, 2)
+        '先判断字典是否有k关键字
+        If Not d.exists(k) Then
+            '一共有5个需要输出的元素
+            ReDim a(1 To 5)
+            a(1) = k
+        Else
+            '把值d(k)赋值给a()
+            a = d(k)
+        End If
+        '对信息a(2 To 5)进行处理
+        If w1.Cells(i, 3) <> "" Then
+            If a(2) <> "" Then
+                a(2) = a(2) & "、" & w1.Cells(i, 3)
+            Else
+                a(2) = a(2) & w1.Cells(i, 3)
+            End If
+        End If
+        If a(3) <> "" Then
+            a(3) = a(3) & "、" & w1.Cells(i, 4)
+        Else
+            a(3) = a(3) & w1.Cells(i, 4)
+        End If
+        If w1.Cells(i, 5) = "半天" Then
+            a(4) = a(4) + 0.5
+            a(5) = a(5) + w1.Range("I4")
+        ElseIf w1.Cells(i, 5) = "全天" Then
+            a(4) = a(4) + 1
+            a(5) = a(5) + w1.Range("I3")
+        ElseIf w1.Cells(i, 5) = "外出" Then
+            a(4) = a(4) + 1
+            a(5) = a(5) + w1.Range("I5")
+        End If      
+        d(k) = a
+        i = i + 1
+    Loop
+    '定位信息a(1 To 5)的输出位置
+    Set r = w2.Range("B2").Resize(d.Count, UBound(a))
+    '使字典值中的数组元素各自分布在一个单元格中
+    r = Application.Transpose(Application.Transpose(d.items))
+    '进行排序
+    '添加自定义列表排序
+    Application.AddCustomList w1.Range("k3:k13")
+    r.Sort key1:=w2.Cells(2, 2), ordercustom:=Application.CustomListCount + 1
+    Application.DeleteCustomList Application.CustomListCount
+    MsgBox "已统计完成!"
+End Sub
+'设置按钮的背景颜色
+Sub mycolor()
+    CommandButton1.BackColor = RGB(112, 173, 71)
+End Sub
